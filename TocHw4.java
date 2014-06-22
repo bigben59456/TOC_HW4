@@ -1,3 +1,13 @@
+/*
+姓名 : 吳邦宇
+學號 : F74006292
+簡述 : 
+將json檔 "土地區段" 欄位取出若符合要找的格式且要未存過的資訊
+搜尋整個檔案中相同的路段最高最低價
+並判斷交易時間是否重複，若否則增加交易次數
+存下此資訊後繼續
+最後印出 交易次數=最大交易次數 的那幾筆資料
+*/
 import java.io.*;
 import java.net.*;
 import org.json.*;
@@ -23,21 +33,21 @@ public class TocHw4
 			String use_road=new String(); //road without detail
 			boolean match=true; //it's a road
 			
-			if(road_detail.indexOf("大道")!=-1) //match 大道
+			if(road_detail.lastIndexOf("大道")!=-1) //match 大道 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
 			{
-				use_road=road_detail.substring(0 ,road_detail.indexOf("大道")+2); //get road name ,+2 to get "大道"
+				use_road=road_detail.substring(0 ,road_detail.lastIndexOf("大道")+2); //get road name ,+2 to get "大道"
 			}
-			else if(road_detail.indexOf("路")!=-1) //match 路
+			else if(road_detail.lastIndexOf("路")!=-1) //match 路 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
 			{
-				use_road=road_detail.substring(0 ,road_detail.indexOf("路")+1); //get road name ,+1 to get "路"
+				use_road=road_detail.substring(0 ,road_detail.lastIndexOf("路")+1); //get road name ,+1 to get "路"
 			}
-			else if(road_detail.indexOf("街")!=-1) //match 街
+			else if(road_detail.lastIndexOf("街")!=-1) //match 街 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
 			{
-				use_road=road_detail.substring(0 ,road_detail.indexOf("街")+1); //get road name ,+1 to get "街"
+				use_road=road_detail.substring(0 ,road_detail.lastIndexOf("街")+1); //get road name ,+1 to get "街"
 			}
-			else if(road_detail.indexOf("巷")!=-1) //match 巷
+			else if(road_detail.lastIndexOf("巷")!=-1) //match 巷 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
 			{
-				use_road=road_detail.substring(0 ,road_detail.indexOf("巷")+1); //get road name ,+1 to get "巷"
+				use_road=road_detail.substring(0 ,road_detail.lastIndexOf("巷")+1); //get road name ,+1 to get "巷"
 			}
 			else match=false; //nothing match -> it's not a road
 			
