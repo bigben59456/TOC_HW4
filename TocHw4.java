@@ -32,7 +32,6 @@ public class TocHw4
 			String road_detail=json.getJSONObject(i).getString("土地區段位置或建物區門牌"); //road in detail of object(i) in array (json.getJSONObject(i) is something like <C style array : json[i]>)
 			String use_road=new String(); //road without detail
 			ArrayList<Integer> tmp_index=new ArrayList<Integer>(); //how to cut use_road
-			boolean match=true; //it's a road
 			
 			if(road_detail.lastIndexOf("大道")!=-1) tmp_index.add(road_detail.lastIndexOf("大道")+2); //match 大道 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
 			if(road_detail.lastIndexOf("路")!=-1) tmp_index.add(road_detail.lastIndexOf("路")+1); //match 路 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
