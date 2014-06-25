@@ -9,6 +9,8 @@
 並判斷交易時間是否重複，若否則增加交易次數
 存下此資訊後繼續
 最後印出 交易次數=最大交易次數 的那幾筆資料
+
+參考 : 檔案的讀取 http://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
 ###################*/
 import java.io.*;
 import java.net.*;
