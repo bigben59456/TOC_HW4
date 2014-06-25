@@ -31,60 +31,46 @@ public class TocHw4
 		{
 			String road_detail=json.getJSONObject(i).getString("土地區段位置或建物區門牌"); //road in detail of object(i) in array (json.getJSONObject(i) is something like <C style array : json[i]>)
 			String use_road=new String(); //road without detail
+			ArrayList<Integer> tmp_index=new ArrayList<Integer>(); //how to cut use_road
 			boolean match=true; //it's a road
 			
-			if(road_detail.lastIndexOf("路")!=-1) //match 路 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
-			{
-				use_road=road_detail.substring(0 ,road_detail.lastIndexOf("路")+1); //get road name ,+1 to get "路"
-			}
-			else if(road_detail.lastIndexOf("大道")!=-1) //match 大道 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
-			{
-				use_road=road_detail.substring(0 ,road_detail.lastIndexOf("大道")+2); //get road name ,+2 to get "大道"
-			}
-			else if(road_detail.lastIndexOf("街")!=-1) //match 街 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
-			{
-				use_road=road_detail.substring(0 ,road_detail.lastIndexOf("街")+1); //get road name ,+1 to get "街"
-			}
-			else if(road_detail.lastIndexOf("巷")!=-1) //match 巷 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
-			{
-				use_road=road_detail.substring(0 ,road_detail.lastIndexOf("巷")+1); //get road name ,+1 to get "巷"
-			}
-			else match=false; //nothing match -> it's not a road
-			
-			if(!match) continue; //ignore this data
-			else //this data should be check
-			{
-				if(road.contains(use_road)) continue; //has set in array list
+			if(road_detail.lastIndexOf("大道")!=-1) tmp_index.add(road_detail.lastIndexOf("大道")+2); //match 大道 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
+			if(road_detail.lastIndexOf("路")!=-1) tmp_index.add(road_detail.lastIndexOf("路")+1); //match 路 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
+			if(road_detail.lastIndexOf("街")!=-1) tmp_index.add(road_detail.lastIndexOf("街")+1); //match 街 (use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
+			if(road_detail.lastIndexOf("巷")!=-1 && tmp_index.size()==0) tmp_index.add(road_detail.lastIndexOf("巷")+1); //match 巷 && no match "路 大道 街"(use lastIndexOf to avoid case like "高雄市路竹區延平路756巷54弄1~30號" the first "路")
 
-				road.add(use_road); //set this road in array list
-				high_price.add(json.getJSONObject(i).getInt("總價元")); //the index of this road high price
-				low_price.add(json.getJSONObject(i).getInt("總價元")); //the index of low price if this road
-				times.add(0); //add index of this road has how many transaction
+			if(tmp_index.size()==0) continue; //nothing match -> it's not a road
 
-				ArrayList<Integer> date=new ArrayList<Integer>(); //save when has transaction
-				Pattern pattern=Pattern.compile(use_road); //find this road name
+			use_road=road_detail.substring(0 ,Collections.max(tmp_index)); //cut the detail
+			if(road.contains(use_road)) continue; //has set in array list
 
-				for(int j=i ;j<json.length() ;++j) //if run this loop means first time match this road so can start at i
+			road.add(use_road); //set this road in array list
+			high_price.add(json.getJSONObject(i).getInt("總價元")); //the index of this road high price
+			low_price.add(json.getJSONObject(i).getInt("總價元")); //the index of low price if this road
+			times.add(0); //add index of this road has how many transaction
+
+			ArrayList<Integer> date=new ArrayList<Integer>(); //save when has transaction
+			Pattern pattern=Pattern.compile(use_road); //find this road name
+
+			for(int j=i ;j<json.length() ;++j) //if run this loop means first time match this road so can start at i
+			{
+				Matcher matcher=pattern.matcher(json.getJSONObject(j).getString("土地區段位置或建物區門牌")); //to match this pattern with object(j) in array
+				
+				if(!matcher.find()) continue; //can't find the road contain this road name
+				if(matcher.start()==0) //this road is we are searching
 				{
-					Matcher matcher=pattern.matcher(json.getJSONObject(j).getString("土地區段位置或建物區門牌")); //to match this pattern with object(j) in array
-					
-					if(!matcher.find()) continue; //can't find the road contain this road name
-					if(matcher.start()==0) //this road is we are searching
+					int when=json.getJSONObject(j).getInt("交易年月"); //transaction time
+					/*price*/
+					if(json.getJSONObject(j).getInt("總價元")>high_price.get(road.indexOf(use_road))) high_price.set(road.indexOf(use_road) ,json.getJSONObject(j).getInt("總價元")); //update high_price
+					if(json.getJSONObject(j).getInt("總價元")<low_price.get(road.indexOf(use_road))) low_price.set(road.indexOf(use_road) ,json.getJSONObject(j).getInt("總價元")); //update low_price
+						
+					/*date*/
+					if(date.contains(when)) continue; //this transaction has counted
+					else //didn't been counted
 					{
-						int when=json.getJSONObject(j).getInt("交易年月"); //transaction time
-
-						/*price*/
-						if(json.getJSONObject(j).getInt("總價元")>=high_price.get(road.indexOf(use_road))) high_price.set(road.indexOf(use_road) ,json.getJSONObject(j).getInt("總價元")); //update high_price
-						if(json.getJSONObject(j).getInt("總價元")<=low_price.get(road.indexOf(use_road))) low_price.set(road.indexOf(use_road) ,json.getJSONObject(j).getInt("總價元")); //update low_price
-							
-						/*date*/
-						if(date.contains(when)) continue; //this transaction has counted
-						else //didn't been counted
-						{
-							int tmp=times.get(road.indexOf(use_road)); //get times
-							times.set(road.indexOf(use_road) ,tmp+1); //times+1 and save
-							date.add(when); //this date has transaction	
-						}
+						int tmp=times.get(road.indexOf(use_road)); //get times
+						times.set(road.indexOf(use_road) ,tmp+1); //times+1 and save
+						date.add(when); //this date has transaction	
 					}
 				}
 			}
